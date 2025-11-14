@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:repairando_mobile/src/constants/app_constants.dart';
 import 'package:repairando_mobile/src/constants/app_images.dart';
 import 'package:repairando_mobile/src/features/appointment/data/appointment_repository.dart';
 import 'package:repairando_mobile/src/features/appointment/domain/appointment_model.dart';
@@ -17,7 +18,10 @@ import 'package:repairando_mobile/src/theme/theme.dart';
 class ConfirmBookingSummaryScreen extends HookConsumerWidget {
   final AppointmentModel appointmentModel;
 
-  const ConfirmBookingSummaryScreen({super.key, required this.appointmentModel});
+  const ConfirmBookingSummaryScreen({
+    super.key,
+    required this.appointmentModel,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -174,7 +178,7 @@ class ConfirmBookingSummaryScreen extends HookConsumerWidget {
                 ),
                 Expanded(
                   child: Text(
-                    '${appointmentModel.price} €',
+                    formatPrice(appointmentModel.price),
                     style: AppTheme.labelStyle,
                   ),
                 ),
@@ -230,7 +234,10 @@ class ConfirmBookingSummaryScreen extends HookConsumerWidget {
                         color: Color(0xFFECEFF4),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: !isDateTimeSelected() ? Colors.red.shade300 : Colors.grey.shade300,
+                          color:
+                              !isDateTimeSelected()
+                                  ? Colors.red.shade300
+                                  : Colors.grey.shade300,
                           width: !isDateTimeSelected() ? 2 : 1,
                         ),
                       ),
@@ -268,9 +275,10 @@ class ConfirmBookingSummaryScreen extends HookConsumerWidget {
                         isLoading.value
                             ? 'confirming'.tr()
                             : 'confirm_booking'.tr(),
-                    onPressed: isLoading.value || !isDateTimeSelected()
-                        ? null
-                        : confirmBooking,
+                    onPressed:
+                        isLoading.value || !isDateTimeSelected()
+                            ? null
+                            : confirmBooking,
                   ),
                 ),
                 SizedBox(width: 20.w),

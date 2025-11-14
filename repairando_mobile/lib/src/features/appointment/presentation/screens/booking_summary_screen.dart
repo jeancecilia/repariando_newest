@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:repairando_mobile/src/constants/app_constants.dart';
 import 'package:repairando_mobile/src/features/appointment/domain/appointment_model.dart';
 import 'package:repairando_mobile/src/features/appointment/presentation/controllers/appointment_controller.dart';
 import 'package:repairando_mobile/src/common/widgets/circle_back_button.dart';
@@ -112,7 +113,7 @@ class BookingSummaryScreen extends HookConsumerWidget {
                 ),
                 Expanded(
                   child: Text(
-                    '${appointmentModel.price} €',
+                    formatPrice(appointmentModel.price),
                     style: AppTheme.labelStyle,
                   ),
                 ),
@@ -136,7 +137,8 @@ class BookingSummaryScreen extends HookConsumerWidget {
             SizedBox(height: 30.h),
 
             // Show Accept/Decline buttons only for offers awaiting response
-            if (appointmentModel.appointmentStatus.toLowerCase() == 'awaiting_offer') ...[
+            if (appointmentModel.appointmentStatus.toLowerCase() ==
+                'awaiting_offer') ...[
               Text(
                 'offer_received'.tr(),
                 style: AppTheme.appBarTitleStyle.copyWith(
@@ -157,23 +159,26 @@ class BookingSummaryScreen extends HookConsumerWidget {
                       onPressed: () async {
                         final shouldDecline = await showDialog<bool>(
                           context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: Text('decline_offer'.tr()),
-                            content: Text('decline_offer_confirmation'.tr()),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, false),
-                                child: Text('cancel'.tr()),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, true),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.red,
+                          builder:
+                              (ctx) => AlertDialog(
+                                title: Text('decline_offer'.tr()),
+                                content: Text(
+                                  'decline_offer_confirmation'.tr(),
                                 ),
-                                child: Text('decline'.tr()),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, false),
+                                    child: Text('cancel'.tr()),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, true),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.red,
+                                    ),
+                                    child: Text('decline'.tr()),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
                         );
 
                         if (shouldDecline == true && context.mounted) {
@@ -181,9 +186,10 @@ class BookingSummaryScreen extends HookConsumerWidget {
                           showDialog(
                             context: context,
                             barrierDismissible: false,
-                            builder: (_) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                            builder:
+                                (_) => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                           );
 
                           final success = await ref
@@ -196,14 +202,20 @@ class BookingSummaryScreen extends HookConsumerWidget {
                             if (success) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('offer_declined_successfully'.tr()),
+                                  content: Text(
+                                    'offer_declined_successfully'.tr(),
+                                  ),
                                   backgroundColor: Colors.orange,
                                 ),
                               );
 
                               // Refresh appointment lists
-                              ref.invalidate(pendingAppointmentsControllerProvider);
-                              ref.invalidate(offerAvailableAppointmentsControllerProvider);
+                              ref.invalidate(
+                                pendingAppointmentsControllerProvider,
+                              );
+                              ref.invalidate(
+                                offerAvailableAppointmentsControllerProvider,
+                              );
 
                               context.pop(); // Go back
                             } else {
@@ -240,23 +252,24 @@ class BookingSummaryScreen extends HookConsumerWidget {
                       onPressed: () async {
                         final shouldAccept = await showDialog<bool>(
                           context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: Text('accept_offer'.tr()),
-                            content: Text('accept_offer_confirmation'.tr()),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, false),
-                                child: Text('cancel'.tr()),
+                          builder:
+                              (ctx) => AlertDialog(
+                                title: Text('accept_offer'.tr()),
+                                content: Text('accept_offer_confirmation'.tr()),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, false),
+                                    child: Text('cancel'.tr()),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () => Navigator.pop(ctx, true),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppTheme.PRIMARY_COLOR,
+                                    ),
+                                    child: Text('accept'.tr()),
+                                  ),
+                                ],
                               ),
-                              ElevatedButton(
-                                onPressed: () => Navigator.pop(ctx, true),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppTheme.PRIMARY_COLOR,
-                                ),
-                                child: Text('accept'.tr()),
-                              ),
-                            ],
-                          ),
                         );
 
                         if (shouldAccept == true && context.mounted) {
@@ -264,9 +277,10 @@ class BookingSummaryScreen extends HookConsumerWidget {
                           showDialog(
                             context: context,
                             barrierDismissible: false,
-                            builder: (_) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                            builder:
+                                (_) => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                           );
 
                           final success = await ref
@@ -279,15 +293,23 @@ class BookingSummaryScreen extends HookConsumerWidget {
                             if (success) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('offer_accepted_successfully'.tr()),
+                                  content: Text(
+                                    'offer_accepted_successfully'.tr(),
+                                  ),
                                   backgroundColor: Colors.green,
                                 ),
                               );
 
                               // Refresh appointment lists
-                              ref.invalidate(pendingAppointmentsControllerProvider);
-                              ref.invalidate(offerAvailableAppointmentsControllerProvider);
-                              ref.invalidate(upcomingAppointmentsControllerProvider);
+                              ref.invalidate(
+                                pendingAppointmentsControllerProvider,
+                              );
+                              ref.invalidate(
+                                offerAvailableAppointmentsControllerProvider,
+                              );
+                              ref.invalidate(
+                                upcomingAppointmentsControllerProvider,
+                              );
 
                               context.pop(); // Go back
                             } else {
