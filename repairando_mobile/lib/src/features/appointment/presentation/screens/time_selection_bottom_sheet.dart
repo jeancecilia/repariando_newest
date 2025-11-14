@@ -126,6 +126,8 @@ class TimeSlotSelectionBottomSheet extends HookConsumerWidget {
               workshopId: appointmentModel.workshopId,
               serviceId: appointmentModel.serviceId,
               leadTimeDays: leadTimeDays,
+              appointmentId: appointmentModel.id,
+              offerWorkUnit: appointmentModel.neededWorkUnit,
             );
 
         // Convert TimeSlot objects to display format
