@@ -84,25 +84,20 @@ class UpcomingAppointmentScreen extends HookConsumerWidget {
                           _buildSectionHeader('upcoming_appointments'.tr()),
                           const SizedBox(height: 16),
                           upcomingAppointments.when(
-                            data:
-                                (appointments) =>
-                                    _buildUpcomingAppointmentsTable(
-                                      context,
-                                      ref,
-                                      appointments,
-                                    ),
-                            loading:
-                                () => const SizedBox(
-                                  height: 200,
-                                  child: Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
+                            data: (appointments) =>
+                                _buildUpcomingAppointmentsTable(
+                                  context,
+                                  ref,
+                                  appointments,
                                 ),
-                            error:
-                                (err, st) => SizedBox(
-                                  height: 200,
-                                  child: Center(child: Text(err.toString())),
-                                ),
+                            loading: () => const SizedBox(
+                              height: 200,
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                            error: (err, st) => SizedBox(
+                              height: 200,
+                              child: Center(child: Text(err.toString())),
+                            ),
                           ),
 
                           const SizedBox(height: 40),
@@ -137,15 +132,12 @@ class UpcomingAppointmentScreen extends HookConsumerWidget {
                                 deleteState,
                               );
                             },
-                            loading:
-                                () => const SizedBox(
-                                  height: 200,
-                                  child: Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                ),
-                            error:
-                                (error, stack) => _buildManualAppointmentsError(
+                            loading: () => const SizedBox(
+                              height: 200,
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                            error: (error, stack) =>
+                                _buildManualAppointmentsError(
                                   context,
                                   ref,
                                   error,
@@ -591,73 +583,7 @@ class UpcomingAppointmentScreen extends HookConsumerWidget {
                     style: GoogleFonts.manrope(fontSize: 12),
                   ),
                 ),
-                const SizedBox(width: 5),
-                OutlinedButton(
-                  onPressed: () async {
-                    final currentUserId = ref.read(currentUserProvider);
-                    final customerId = appointment.customer?.id;
-
-                    if (currentUserId != null && customerId != null) {
-                      try {
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder:
-                              (_) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                        );
-
-                        final messagesController = ref.read(
-                          messagesControllerProvider.notifier,
-                        );
-                        final chat = await messagesController
-                            .initiateChatWithCustomerId(
-                              customerId: customerId,
-                              currentUserId: currentUserId,
-                              initialMessage: null,
-                            );
-
-                        Navigator.of(context).pop();
-
-                        if (chat != null) {
-                          context.go('${AppRoutes.messages}?chatId=${chat.id}');
-                        }
-                      } catch (e) {
-                        if (Navigator.canPop(context)) {
-                          Navigator.of(context).pop();
-                        }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error: ${e.toString()}'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.PRIMARY_COLOR,
-                    side: const BorderSide(color: AppTheme.PRIMARY_COLOR),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    minimumSize: const Size(60, 32),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'message'.tr(),
-                        style: GoogleFonts.manrope(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
+                AppointmentMessageButton(appointment: appointment),
               ],
             ),
           ),
@@ -808,43 +734,43 @@ class UpcomingAppointmentScreen extends HookConsumerWidget {
                         const SizedBox(width: 5),
                         deleteState.isLoading
                             ? const SizedBox(
-                              width: 80,
-                              height: 32,
-                              child: Center(
-                                child: SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                                width: 80,
+                                height: 32,
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
+                              )
                             : ElevatedButton(
-                              onPressed: () {
-                                _showDeleteConfirmationDialog(
-                                  context,
-                                  appointment,
-                                  ref,
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 10,
+                                onPressed: () {
+                                  _showDeleteConfirmationDialog(
+                                    context,
+                                    appointment,
+                                    ref,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 10,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  minimumSize: const Size(80, 32),
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6),
+                                child: Text(
+                                  'delete'.tr(),
+                                  style: GoogleFonts.manrope(fontSize: 12),
                                 ),
-                                minimumSize: const Size(80, 32),
                               ),
-                              child: Text(
-                                'delete'.tr(),
-                                style: GoogleFonts.manrope(fontSize: 12),
-                              ),
-                            ),
                         const SizedBox(width: 5),
                         OutlinedButton(
                           onPressed: () {
@@ -930,33 +856,32 @@ class UpcomingAppointmentScreen extends HookConsumerWidget {
   ) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Colors.white,
-            title: Text('confirm_delete'.tr()),
-            content: Text(
-              '${'are_you_sure_delete_appointment'.tr()} ${appointment.customerName}?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('cancel'.tr()),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  ref
-                      .read(deleteManualAppointmentControllerProvider.notifier)
-                      .deleteAppointment(appointment.id);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                ),
-                child: Text('delete'.tr()),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: Text('confirm_delete'.tr()),
+        content: Text(
+          '${'are_you_sure_delete_appointment'.tr()} ${appointment.customerName}?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('cancel'.tr()),
           ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ref
+                  .read(deleteManualAppointmentControllerProvider.notifier)
+                  .deleteAppointment(appointment.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('delete'.tr()),
+          ),
+        ],
+      ),
     );
   }
 
@@ -966,47 +891,43 @@ class UpcomingAppointmentScreen extends HookConsumerWidget {
   ) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Colors.white,
-            title: Text('appointment_details'.tr()),
-            content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildDetailRow('customer'.tr(), appointment.customerName),
-                  _buildDetailRow('service'.tr(), appointment.serviceName),
-                  _buildDetailRow(
-                    'vehicle'.tr(),
-                    '${appointment.vehicleMake} ${appointment.vehicleModel} (${appointment.vehicleYear})',
-                  ),
-                  _buildDetailRow('date'.tr(), appointment.appointmentDate),
-                  _buildDetailRow('time'.tr(), appointment.timeSlotDisplay),
-                  _buildDetailRow(
-                    'duration_display'.tr(),
-                    appointment.durationDisplay,
-                  ),
-                  _buildDetailRow('price'.tr(), '${appointment.price}€'),
-                  _buildDetailRow('email'.tr(), appointment.emailAddress),
-                  _buildDetailRow('phone'.tr(), appointment.phoneNumber),
-                  _buildDetailRow(
-                    'status'.tr(),
-                    appointment.status ?? 'pending',
-                  ),
-                  if (appointment.additionalNotes != null &&
-                      appointment.additionalNotes!.isNotEmpty)
-                    _buildDetailRow('notes'.tr(), appointment.additionalNotes!),
-                ],
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: Text('appointment_details'.tr()),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildDetailRow('customer'.tr(), appointment.customerName),
+              _buildDetailRow('service'.tr(), appointment.serviceName),
+              _buildDetailRow(
+                'vehicle'.tr(),
+                '${appointment.vehicleMake} ${appointment.vehicleModel} (${appointment.vehicleYear})',
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('close'.tr()),
+              _buildDetailRow('date'.tr(), appointment.appointmentDate),
+              _buildDetailRow('time'.tr(), appointment.timeSlotDisplay),
+              _buildDetailRow(
+                'duration_display'.tr(),
+                appointment.durationDisplay,
               ),
+              _buildDetailRow('price'.tr(), '${appointment.price}€'),
+              _buildDetailRow('email'.tr(), appointment.emailAddress),
+              _buildDetailRow('phone'.tr(), appointment.phoneNumber),
+              _buildDetailRow('status'.tr(), appointment.status ?? 'pending'),
+              if (appointment.additionalNotes != null &&
+                  appointment.additionalNotes!.isNotEmpty)
+                _buildDetailRow('notes'.tr(), appointment.additionalNotes!),
             ],
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('close'.tr()),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1036,32 +957,31 @@ class UpcomingAppointmentScreen extends HookConsumerWidget {
   ) {
     return showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Colors.white,
-            title: Text(
-              title,
-              style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: Text(
+          title,
+          style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
+        ),
+        content: Text(message, style: GoogleFonts.manrope()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              'cancel'.tr(),
+              style: GoogleFonts.manrope(color: Colors.grey[600]),
             ),
-            content: Text(message, style: GoogleFonts.manrope()),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(
-                  'cancel'.tr(),
-                  style: GoogleFonts.manrope(color: Colors.grey[600]),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.PRIMARY_COLOR,
-                  foregroundColor: Colors.white,
-                ),
-                child: Text('confirm'.tr(), style: GoogleFonts.manrope()),
-              ),
-            ],
           ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.PRIMARY_COLOR,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('confirm'.tr(), style: GoogleFonts.manrope()),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1069,5 +989,89 @@ class UpcomingAppointmentScreen extends HookConsumerWidget {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
+  }
+}
+
+class AppointmentMessageButton extends HookConsumerWidget {
+  const AppointmentMessageButton({super.key, required this.appointment});
+
+  final AppointmentModel appointment;
+
+  static const messageButtonKey = Key('upcomingAppointmentMessageButton');
+
+  bool get _canShowButton {
+    final customer = appointment.customer;
+    if (customer == null) {
+      return false;
+    }
+
+    return customer.id.isNotEmpty;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!_canShowButton) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 5),
+      child: OutlinedButton(
+        key: messageButtonKey,
+        onPressed: () async {
+          final currentUserId = ref.read(currentUserProvider);
+          final customerId = appointment.customer?.id;
+
+          if (currentUserId != null && customerId != null) {
+            try {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) =>
+                    const Center(child: CircularProgressIndicator()),
+              );
+
+              final messagesController = ref.read(
+                messagesControllerProvider.notifier,
+              );
+              final chat = await messagesController.initiateChatWithCustomerId(
+                customerId: customerId,
+                currentUserId: currentUserId,
+                initialMessage: null,
+              );
+
+              Navigator.of(context).pop();
+
+              if (chat != null) {
+                context.go('${AppRoutes.messages}?chatId=${chat.id}');
+              }
+            } catch (e) {
+              if (Navigator.canPop(context)) {
+                Navigator.of(context).pop();
+              }
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error: ${e.toString()}'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+        },
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppTheme.PRIMARY_COLOR,
+          side: const BorderSide(color: AppTheme.PRIMARY_COLOR),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          minimumSize: const Size(60, 32),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('message'.tr(), style: GoogleFonts.manrope(fontSize: 12)),
+          ],
+        ),
+      ),
+    );
   }
 }
