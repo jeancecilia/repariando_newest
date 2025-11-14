@@ -94,6 +94,15 @@ class ServiceRepository {
       final updates = request.toJson();
       updates['admin_id'] = userId;
 
+      // DEBUG: Print what we're about to save
+      print('🔧 DEBUG: Saving service data:');
+      print('   User ID: $userId');
+      print('   Service ID: ${request.serviceId}');
+      print('   Is Available: ${request.isAvailable}');
+      print('   Price: ${request.price}');
+      print('   Duration: ${request.durationMinutes}');
+      print('   Full updates object: $updates');
+
       // Check if admin service already exists
       final existingService =
           await _client
@@ -103,10 +112,13 @@ class ServiceRepository {
               .eq('service_id', request.serviceId)
               .maybeSingle();
 
+      print('   Existing service found: ${existingService != null}');
+
       late final Map<String, dynamic> response;
 
       if (existingService != null) {
         // Update existing record
+        print('   Action: UPDATING existing record (ID: ${existingService['id']})');
         response =
             await _client
                 .from('admin_services')
@@ -117,6 +129,7 @@ class ServiceRepository {
                 .single();
       } else {
         // Insert new record
+        print('   Action: INSERTING new record');
         response =
             await _client
                 .from('admin_services')
@@ -125,10 +138,15 @@ class ServiceRepository {
                 .single();
       }
 
+      print('✅ DEBUG: Save successful! Response: $response');
       return AdminServiceModel.fromJson(response);
     } on PostgrestException catch (e) {
+      print('❌ DEBUG: PostgrestException: ${e.message}');
+      print('   Details: ${e.details}');
+      print('   Hint: ${e.hint}');
       throw CustomException(e.message);
     } catch (e) {
+      print('❌ DEBUG: General Exception: $e');
       throw CustomException("Unable to update service: $e");
     }
   }

@@ -438,13 +438,23 @@ class ServiceManagementScreen extends HookConsumerWidget {
     try {
       final requests = <UpdateServiceRequest>[];
 
+      print('🔍 DEBUG: Starting to collect service data from ${controllers.length} services');
+
       for (final entry in controllers.entries) {
         final serviceId = entry.key;
         final controller = entry.value;
         final isAvailable = checkboxStates[serviceId] ?? false;
 
-        final price = double.tryParse(controller.priceController.text) ?? 0.0;
-        final duration = controller.durationController.text;
+        final priceText = controller.priceController.text;
+        final durationText = controller.durationController.text;
+        final price = double.tryParse(priceText) ?? 0.0;
+        final duration = durationText;
+
+        print('📝 Service $serviceId:');
+        print('   Price text input: "$priceText"');
+        print('   Duration text input: "$durationText"');
+        print('   Parsed price: $price');
+        print('   Is Available checkbox: $isAvailable');
 
         requests.add(
           UpdateServiceRequest(
@@ -455,6 +465,8 @@ class ServiceManagementScreen extends HookConsumerWidget {
           ),
         );
       }
+
+      print('✅ DEBUG: Collected ${requests.length} service update requests');
 
       await ref
           .read(updateServiceControllerProvider.notifier)

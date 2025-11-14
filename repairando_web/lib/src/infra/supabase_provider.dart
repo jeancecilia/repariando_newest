@@ -11,6 +11,13 @@ class SupabaseConfig {
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlycmNxcXR1YmN4bmRqbWptb2tsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2OTAwNjYsImV4cCI6MjA2OTI2NjA2Nn0.YETb7x88_ouZmSFhyxNs8VGDQNlqcLgkf8LpW-LKbgg';
 
   static Future<void> initialize() async {
-    await Supabase.initialize(url: url, anonKey: anonKey);
+    await Supabase.initialize(
+      url: url,
+      anonKey: anonKey,
+      authOptions: const FlutterAuthClientOptions(
+        authFlowType: AuthFlowType.pkce,
+        autoRefreshToken: true,
+      ),
+    );
   }
 }

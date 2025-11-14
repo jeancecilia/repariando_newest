@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:repairando_web/src/features/auth/data/auth_repository.dart';
 import 'package:repairando_web/src/features/auth/domain/workshop_registration_model.dart';
 import 'package:repairando_web/src/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:repairando_web/src/features/auth/presentation/screens/login_screen.dart';
@@ -16,6 +19,7 @@ import 'package:repairando_web/src/features/home/presentation/screens/upcoming_a
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:repairando_web/src/features/onboarding/presentation/screens/splash_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -39,9 +43,15 @@ class AppRoutes {
 }
 
 final goRouterProvider = Provider<GoRouter>((ref) {
+  final authRepository = ref.watch(authRepositoryProvider);
+
   return GoRouter(
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
+
+    refreshListenable: GoRouterRefreshStream(
+      authRepository.client.auth.onAuthStateChange,
+    ),
 
     routes: [
       // Auth routes
@@ -114,6 +124,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     ],
 
     redirect: (context, state) {
+      final isAuthenticated = authRepository.isAuthenticated;
+      final isGoingToAuth = _isAuthRoute(state.matchedLocation);
+      final isGoingToSplash = state.matchedLocation == AppRoutes.splash;
+
+      // If not authenticated and trying to access protected route, redirect to login
+      if (!isAuthenticated && !isGoingToAuth && !isGoingToSplash) {
+        return AppRoutes.login;
+      }
+
+      // If authenticated and trying to access auth routes, redirect to home
+      if (isAuthenticated && isGoingToAuth) {
+        return AppRoutes.home;
+      }
+
+      // No redirect needed
       return null;
     },
   );
@@ -128,4 +153,24 @@ bool _isAuthRoute(String path) {
     AppRoutes.workshopProfileSetup,
   ];
   return authRoutes.contains(path);
+}
+
+// Stream notifier for GoRouter to refresh on auth state changes
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<AuthState> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen(
+      (AuthState _) {
+        notifyListeners();
+      },
+    );
+  }
+
+  late final StreamSubscription<AuthState> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
 }

@@ -22,7 +22,7 @@ class RequestDetailScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = useTextEditingController(
-      text: appointment.issueNote! ?? '',
+      text: appointment.issueNote ?? '',
     );
     return Scaffold(
       backgroundColor: AppTheme.BACKGROUND_COLOR,

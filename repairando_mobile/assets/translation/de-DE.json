@@ -329,5 +329,17 @@
   "no_messages_yet_chat": "Noch keine Nachrichten",
   "failed_to_send_pdf": "PDF konnte nicht gesendet werden: {error}",
   "cannot_open_pdf": "PDF kann nicht geöffnet werden",
-  "error_opening_pdf": "Fehler beim Öffnen der PDF"
+  "error_opening_pdf": "Fehler beim Öffnen der PDF",
+  "offer_received": "Angebot erhalten",
+  "offer_decision_prompt": "Die Werkstatt hat Ihnen ein Angebot gesendet. Bitte prüfen Sie es und entscheiden Sie, ob Sie es annehmen oder ablehnen möchten.",
+  "accept_offer": "Angebot annehmen",
+  "decline_offer": "Angebot ablehnen",
+  "accept_offer_confirmation": "Sind Sie sicher, dass Sie dieses Angebot annehmen und mit der Buchung fortfahren möchten?",
+  "decline_offer_confirmation": "Sind Sie sicher, dass Sie dieses Angebot ablehnen möchten?",
+  "decline": "Ablehnen",
+  "accept": "Annehmen",
+  "offer_accepted_successfully": "Angebot angenommen! Ihr Termin wurde bestätigt.",
+  "offer_declined_successfully": "Angebot abgelehnt.",
+  "error_accepting_offer": "Fehler beim Annehmen des Angebots. Bitte versuchen Sie es erneut.",
+  "error_declining_offer": "Fehler beim Ablehnen des Angebots. Bitte versuchen Sie es erneut."
 }

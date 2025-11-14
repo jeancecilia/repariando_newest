@@ -953,4 +953,46 @@ class AppointmentRepository {
       throw Exception('Failed to fetch appointment: $e');
     }
   }
+
+  // Accept an offer from workshop (customer action)
+  Future<bool> acceptOffer(String appointmentId) async {
+    try {
+      final userId = _supabaseClient.auth.currentUser?.id;
+      if (userId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final response = await _supabaseClient
+          .from('appointments')
+          .update({'appointment_status': 'accepted'})
+          .eq('id', appointmentId)
+          .eq('customer_id', userId)
+          .select();
+
+      return (response as List).isNotEmpty;
+    } catch (e) {
+      throw Exception('Failed to accept offer: $e');
+    }
+  }
+
+  // Decline an offer from workshop (customer action)
+  Future<bool> declineOffer(String appointmentId) async {
+    try {
+      final userId = _supabaseClient.auth.currentUser?.id;
+      if (userId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final response = await _supabaseClient
+          .from('appointments')
+          .update({'appointment_status': 'rejected'})
+          .eq('id', appointmentId)
+          .eq('customer_id', userId)
+          .select();
+
+      return (response as List).isNotEmpty;
+    } catch (e) {
+      throw Exception('Failed to decline offer: $e');
+    }
+  }
 }

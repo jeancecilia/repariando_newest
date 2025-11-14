@@ -6,6 +6,7 @@ import 'package:repairando_web/src/features/home/presentation/controllers/worksh
 import 'package:repairando_web/src/features/home/presentation/screens/base_layout.dart';
 import 'package:repairando_web/src/router/app_router.dart';
 import 'package:repairando_web/src/theme/theme.dart';
+import 'package:repairando_web/src/widgets/make_offer_dialog.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -942,11 +943,18 @@ class HomeScreen extends HookConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                if (appointment.price == '0.0' &&
-                    appointment.appointmentStatus == 'pending')
+                if ((appointment.price == null ||
+                     appointment.price == '0.0' ||
+                     appointment.price == '0' ||
+                     appointment.price == '') &&
+                    appointment.appointmentStatus == 'pending') ...[
+                  // Offer-based appointment - show Make an Offer button
                   OutlinedButton(
                     onPressed: () {
-                      context.push(AppRoutes.requestDetail, extra: appointment);
+                      showDialog(
+                        context: context,
+                        builder: (_) => MakeOfferDialog(appointment: appointment),
+                      );
                     },
                     style: OutlinedButton.styleFrom(
                       backgroundColor: AppTheme.BROWN_ORANGE_COLOR,
@@ -963,15 +971,20 @@ class HomeScreen extends HookConsumerWidget {
                       minimumSize: const Size(60, 32),
                     ),
                     child: Text(
-                      'go_to_details'.tr(),
+                      'make_an_offer'.tr(),
                       style: GoogleFonts.manrope(
                         fontSize: 12,
                         color: Colors.white,
                       ),
                     ),
-                  )
-                else if (appointment.price != '0.0' &&
+                  ),
+                ]
+                else if (appointment.price != null &&
+                    appointment.price != '0.0' &&
+                    appointment.price != '0' &&
+                    appointment.price != '' &&
                     appointment.appointmentStatus == 'pending') ...[
+                  // Fixed-price appointment - show Accept/Reject buttons
                   Row(
                     children: [
                       OutlinedButton(
@@ -1086,6 +1099,7 @@ class HomeScreen extends HookConsumerWidget {
                     ],
                   ),
                 ] else if (appointment.appointmentStatus != 'pending') ...[
+                  // Non-pending appointment - show Cancel button
                   OutlinedButton(
                     onPressed: () async {
                       final shouldCancel = await _showConfirmationDialog(

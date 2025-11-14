@@ -230,3 +230,45 @@ final appointmentByIdProvider =
       final repository = ref.watch(appointmentRepositoryProvider);
       return repository.getAppointmentById(appointmentId);
     });
+
+// Offer Action Controller (for accepting/declining offers)
+class OfferActionController extends StateNotifier<AsyncValue<bool>> {
+  final AppointmentRepository _repository;
+
+  OfferActionController(this._repository) : super(const AsyncData(false));
+
+  Future<bool> acceptOffer(String appointmentId) async {
+    state = const AsyncLoading();
+    try {
+      final success = await _repository.acceptOffer(appointmentId);
+      state = AsyncData(success);
+      return success;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      return false;
+    }
+  }
+
+  Future<bool> declineOffer(String appointmentId) async {
+    state = const AsyncLoading();
+    try {
+      final success = await _repository.declineOffer(appointmentId);
+      state = AsyncData(success);
+      return success;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      return false;
+    }
+  }
+
+  void reset() {
+    state = const AsyncData(false);
+  }
+}
+
+// Provider for offer actions
+final offerActionControllerProvider =
+    StateNotifierProvider<OfferActionController, AsyncValue<bool>>((ref) {
+  final repository = ref.watch(appointmentRepositoryProvider);
+  return OfferActionController(repository);
+});

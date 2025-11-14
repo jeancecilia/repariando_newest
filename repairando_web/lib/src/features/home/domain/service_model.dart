@@ -70,6 +70,17 @@ class AdminServiceModel {
   });
 
   factory AdminServiceModel.fromJson(Map<String, dynamic> json) {
+    // Handle price as either string or number from database
+    double parsedPrice = 0.0;
+    final priceValue = json['price'];
+    if (priceValue != null) {
+      if (priceValue is String) {
+        parsedPrice = double.tryParse(priceValue) ?? 0.0;
+      } else if (priceValue is num) {
+        parsedPrice = priceValue.toDouble();
+      }
+    }
+
     return AdminServiceModel(
       id: json['id'] ?? 0,
       createdAt: DateTime.parse(
@@ -78,7 +89,7 @@ class AdminServiceModel {
       adminId: json['admin_id'] ?? '',
       serviceId: json['service_id'] ?? '',
       isAvailable: json['is_available'] ?? false,
-      price: (json['price'] ?? 0).toDouble(),
+      price: parsedPrice,
       durationMinutes: json['duration_minutes'] ?? '',
     );
   }
