@@ -1,11 +1,24 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:meta/meta.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final appointmentRepositoryProvider = Provider<AppointmentRepository>((ref) {
   final supabase = Supabase.instance.client;
   return AppointmentRepository(supabase);
 });
+
+@visibleForTesting
+int? convertWorkUnitToMinutesOrNull(String? workUnits) {
+  if (workUnits == null) return null;
+  final trimmed = workUnits.trim();
+  if (trimmed.isEmpty) return null;
+
+  final wu = double.tryParse(trimmed);
+  if (wu == null) return null;
+
+  return (wu * 6).round();
+}
 
 class TimeSlot {
   final String startTime;
@@ -183,9 +196,7 @@ class AppointmentRepository {
 
   /// Helper method to convert WU to minutes (1 WU = 6 minutes)
   int _convertWUToMinutes(String? workUnits) {
-    if (workUnits == null || workUnits.isEmpty) return 60;
-    final wu = double.tryParse(workUnits) ?? 10;
-    return (wu * 6).round();
+    return convertWorkUnitToMinutesOrNull(workUnits) ?? 60;
   }
 
   /// FIXED: Helper method to parse German booking lead time to days
@@ -809,8 +820,10 @@ class AppointmentRepository {
     required String workshopId,
     required String serviceId,
     required int leadTimeDays,
-    String?
-    appointmentId, // Optional: to get duration from specific appointment
+    // Optional: to get duration from specific appointment
+    String? appointmentId,
+    // Optional: workshop-provided duration override
+    String? offerWorkUnit,
   }) async {
     try {
       final Map<String, List<TimeSlot>> fullMonthTimeSlots = {};
@@ -818,7 +831,11 @@ class AppointmentRepository {
       // Get service duration from appointments table instead of admin_services
       int serviceDurationMinutes;
 
-      if (appointmentId != null) {
+      final offerDuration = convertWorkUnitToMinutesOrNull(offerWorkUnit);
+
+      if (offerDuration != null) {
+        serviceDurationMinutes = offerDuration;
+      } else if (appointmentId != null) {
         // Get duration from specific appointment
         serviceDurationMinutes = await _getAppointmentDuration(appointmentId);
       } else {
